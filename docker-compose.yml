@@ -1,0 +1,26 @@
+version: '3.5'
+
+services:
+    app:
+        build: ./docker/images/php81
+        working_dir: /var/www/html
+        ports:
+            - "8001:8000"
+        links:
+            - postgresql
+        volumes:
+            - ./application:/var/www/html
+            - ./docker/images/php81/files/php/php.ini:/usr/local/etc/php/conf.d/php.ini
+        restart: always
+    postgresql:
+        image: postgres:14.1-alpine
+        ports:
+            - "5430:5432"
+        environment:
+            POSTGRES_USER: root
+            POSTGRES_PASSWORD: pQLkm8NOkS0gOBox
+            POSTGRES_DB: smartis
+        volumes:
+            - ./docker/images/postgres/files/postgresql.conf:/etc/postgresql.conf
+        command: ["postgres", "-c", "config_file=/etc/postgresql.conf"]
+        restart: always
