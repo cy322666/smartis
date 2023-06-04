@@ -50,50 +50,43 @@ class GetInfo2 extends Command
         $dateTo   = Carbon::parse($first->datetime)->format('Y-m-d H:i:s');
         $dateFrom = Carbon::parse($latest->datetime)->format('Y-m-d H:i:s');
 
-        try {
+        $smartisResponse = Http::withToken(env('SMARTIS_TOKEN'))
+            ->post('https://my.smartis.bi/api/reports/getReport', [
+                "project" => "object_2369",
+                "metrics" => "crm_amo_all;",
+                "groupBy" => "day",
+                "datetimeFrom" => $dateFrom,
+                "datetimeTo"   => $dateTo,
+                "type"     => "raw",
+                "filters" => [
+                    [
+                        "filter_category"  => 36213,
+                        "filter_condition" => "!=",
+                        "filter_value"     => false
+                    ]
+                ],
+                "attribution" => [
+                    "model_id"    => 2,
+                    "period"      => "365",
+                    "with_direct" => true
+                ],
+                "topCount" => 500,
+            ]);
 
-            $smartisResponse = Http::withToken(env('SMARTIS_TOKEN'))
-                ->post('https://my.smartis.bi/api/reports/getReport', [
-                    "project" => "object_2369",
-                    "metrics" => "crm_amo_all;",
-                    "groupBy" => "day",
-                    "datetimeFrom" => $dateFrom,
-                    "datetimeTo"   => $dateTo,
-                    "type"     => "raw",
-                    "filters" => [
-                        [
-                            "filter_category"  => 36213,
-                            "filter_condition" => "!=",
-                            "filter_value"     => false
-                        ]
-                    ],
-                    "attribution" => [
-                        "model_id"    => 2,
-                        "period"      => "365",
-                        "with_direct" => true
-                    ],
-                    "topCount" => 500,
-                ]);
+        $smartis = json_decode($smartisResponse->body());
 
-            $smartis = json_decode($smartisResponse->body());
+        foreach ($smartis->reports->crm_amo_all as $detail) {
 
-            foreach ($smartis->reports->crm_amo_all as $detail) {
-
-                Lead::query()->updateOrCreate([
-                    'person_id'  => $detail->person_id,
-                ], [
-                    'datetime'    => Carbon::parse($detail->created_at)->format('Y-m-d H:i:s'),
-                    'date'        => $detail->date,
-                    'person_id'   => $detail->person_id,
-                    'smartis_id'  => $detail->id,
-                    'lead_id'     => $detail->external_id,
-                    'last_click'  => $detail->sources_placements,
-                ]);
-            }
-
-        } catch (Throwable $e) {
-
-            dd($e->getMessage());
+            Lead::query()->updateOrCreate([
+                'person_id'  => $detail->person_id,
+            ], [
+                'datetime'    => Carbon::parse($detail->created_at)->format('Y-m-d H:i:s'),
+                'date'        => $detail->date,
+                'person_id'   => $detail->person_id,
+                'smartis_id'  => $detail->id,
+                'lead_id'     => $detail->external_id,
+                'last_click'  => $detail->sources_placements,
+            ]);
         }
 
         return CommandAlias::SUCCESS;
