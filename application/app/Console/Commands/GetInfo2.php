@@ -4,13 +4,10 @@ namespace App\Console\Commands;
 
 use App\Models\Lead;
 use Carbon\Carbon;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Laravel\Octane\Exceptions\DdException;
 use Symfony\Component\Console\Command\Command as CommandAlias;
-use Throwable;
 
 class GetInfo2 extends Command
 {
@@ -32,7 +29,6 @@ class GetInfo2 extends Command
      * Execute the console command.
      *
      * @return int
-     * @throws DdException
      */
     public function handle(): int
     {

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="c152ae0f-43c5-4d51-880f-a443085aeba5" name="rodina.prod">
+        <fileTransfer accessType="SFTP" host="77.105.172.149" port="22" sshConfigId="cd1623c2-6388-436e-b5ec-9cc7248b12df" sshConfig="rodina.prod">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
