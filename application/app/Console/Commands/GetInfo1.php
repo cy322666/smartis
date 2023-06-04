@@ -45,11 +45,9 @@ class GetInfo1 extends Command
 
         $dateTo   = $latestDate->format('Y-m-d H:i:s');
         $dateFrom = $latest ?
-                    $latestDate->subDays(2)->format('Y-m-d H:i:s') :
+                    $latestDate->subDays(3)->format('Y-m-d H:i:s') :
                     Carbon::now()->subDays(365);
-
         try {
-
             $smartisResponse = Http::withToken(env('SMARTIS_TOKEN'))
                 ->post('https://my.smartis.bi/api/reports/getReport', [
                     "project" => "object_2369",
