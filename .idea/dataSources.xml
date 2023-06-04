@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:postgresql://localhost:5430/smartis</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="smartis@prod" uuid="729e8663-4412-4317-a3b4-4a34c21b3171">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://77.105.172.149:5430/smartis</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

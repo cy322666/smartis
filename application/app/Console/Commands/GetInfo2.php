@@ -47,6 +47,7 @@ class GetInfo2 extends Command
         $dateFrom = Carbon::parse($latest->datetime)->format('Y-m-d H:i:s');
 
         $smartisResponse = Http::withToken(env('SMARTIS_TOKEN'))
+            ->timeout(180)
             ->post('https://my.smartis.bi/api/reports/getReport', [
                 "project" => "object_2369",
                 "metrics" => "crm_amo_all;",
