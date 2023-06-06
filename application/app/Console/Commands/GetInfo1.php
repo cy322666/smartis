@@ -80,7 +80,7 @@ class GetInfo1 extends Command
                 'person_id'   => $detail->person_id,
                 'smartis_id'  => $detail->id,
                 'lead_id'     => $detail->external_id,
-                'first_click' => $detail->sources_placements,
+                'last_click' => $detail->sources_placements,
             ]);
         }
 
