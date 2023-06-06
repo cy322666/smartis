@@ -75,7 +75,7 @@ class GetInfo2 extends Command
         foreach ($smartis->reports->crm_amo_all as $detail) {
 
             Lead::query()->updateOrCreate([
-                'external_id'  => $detail->external_id,
+                'lead_id'  => $detail->external_id,
             ], [
 //                'datetime'    => Carbon::parse($detail->created_at)->format('Y-m-d H:i:s'),
 //                'date'        => $detail->date,
