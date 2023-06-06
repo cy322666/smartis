@@ -77,10 +77,10 @@ class GetInfo2 extends Command
             Lead::query()->updateOrCreate([
                 'lead_id'  => $detail->external_id,
             ], [
-//                'datetime'    => Carbon::parse($detail->created_at)->format('Y-m-d H:i:s'),
-//                'date'        => $detail->date,
-//                'person_id'   => $detail->person_id,
-//                'smartis_id'  => $detail->id,
+                'datetime'    => Carbon::parse($detail->created_at)->format('Y-m-d H:i:s'),
+                'date'        => $detail->date,
+                'person_id'   => $detail->person_id,
+                'smartis_id'  => $detail->id,
 //                'lead_id'     => $detail->external_id,
                 'last_click'  => $detail->sources_placements,
             ]);
