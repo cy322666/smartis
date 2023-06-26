@@ -2,7 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Account;
 use App\Models\Lead;
+use App\Services\amoCRM\Client;
+use Exception;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 
@@ -26,8 +29,9 @@ class SendAmoCRM extends Command
      * Execute the console command.
      *
      * @return int
+     * @throws Exception
      */
-    public function handle()
+    public function handle(): int
     {
         $leads = Lead::query()
             ->where('first_click', '!=', null)
@@ -36,16 +40,22 @@ class SendAmoCRM extends Command
             ->limit(env('LIMIT_SEND'))
             ->get();
 
-        foreach ($leads as $lead) {
+        foreach ($leads as $model) {
 
-            if ($lead->first_click !== 'Остальное' &&
-                $lead->last_click !== 'Остальное') {
+            if ($model->first_click !== 'Остальное' &&
+                $model->last_click !== 'Остальное') {
 
-                //send
+                $amoApi = (new Client(Account::first()))->init();
+
+                $lead = $amoApi->service->leads()->find($model->lead_id);
+
+                $lead->cf('')->setValue();
+                $lead->cf('')->setValue();
+                $lead->save();
             }
 
-            $lead->send = true;
-            $lead->save();
+            $model->send = true;
+            $model->save();
         }
 
         return CommandAlias::SUCCESS;
