@@ -30,15 +30,20 @@ class SendAmoCRM extends Command
     public function handle()
     {
         $leads = Lead::query()
-            ->where('first_clock', '!=', null)
-            ->where('last_clock', '!=', null)
+            ->where('first_click', '!=', null)
+            ->where('last_click', '!=', null)
             ->where('send', false)
             ->limit(env('LIMIT_SEND'))
             ->get();
 
         foreach ($leads as $lead) {
 
-            //send
+            if ($lead->first_click !== 'Остальное' &&
+                $lead->last_click !== 'Остальное') {
+
+                //send
+            }
+
             $lead->send = true;
             $lead->save();
         }

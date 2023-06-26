@@ -32,25 +32,22 @@ class GetInfo2 extends Command
      */
     public function handle(): int
     {
-//        $first = Lead::query()
-//            ->where('send', false)
-//            ->where('last_click', null)
-//            ->orderByDesc('datetime')
-//            ->first();
-//
-//        $latest = Lead::query()
-//            ->where('send', false)
-//            ->orderBy('datetime')
-//            ->first();
-//
-//        $dateTo   = Carbon::parse($first->datetime ?? Carbon::now())->format('Y-m-d H:i:s');
-//        $dateFrom = Carbon::parse($latest->datetime ?? Carbon::now()->subYears(3))->format('Y-m-d H:i:s');
+        $first = Lead::query()
+            ->where('send', false)
+            ->where('last_click', null)
+            ->orderByDesc('datetime')
+            ->first();
 
-        $dateTo   = Carbon::now()->format('Y-m-d H:i:s'); //$latestDate->format('Y-m-d H:i:s');
-        $dateFrom = Carbon::now()->subDays(365);
+        $latest = Lead::query()
+            ->where('send', false)
+            ->orderBy('datetime')
+            ->first();
+
+        $dateTo   = Carbon::parse($first->datetime ?? Carbon::now())->format('Y-m-d H:i:s');
+        $dateFrom = Carbon::parse($latest->datetime ?? Carbon::now()->subDays(365))->format('Y-m-d H:i:s');
 
         $smartisResponse = Http::withToken(env('SMARTIS_TOKEN'))
-            ->timeout(300)
+            ->timeout(180)
             ->post('https://my.smartis.bi/api/reports/getReport', [
                 "project" => "object_2369",
                 "metrics" => "crm_amo_all;",
@@ -66,7 +63,7 @@ class GetInfo2 extends Command
                     ]
                 ],
                 "attribution" => [
-                    "model_id"    => 16,
+                    "model_id"    => 2,
                     "period"      => "365",
                     "with_direct" => true
                 ],
@@ -77,11 +74,16 @@ class GetInfo2 extends Command
 
         foreach ($smartis->reports->crm_amo_all as $detail) {
 
-            Lead::query()
-                ->where('lead_id', $detail->external_id)
-                ->update([
-                    'last_click'  => $detail->sources_placements,
-                ]);
+            Lead::query()->updateOrCreate([
+                'lead_id'  => $detail->external_id,
+            ], [
+                'datetime'    => Carbon::parse($detail->created_at)->format('Y-m-d H:i:s'),
+                'date'        => $detail->date,
+                'person_id'   => $detail->person_id,
+                'smartis_id'  => $detail->id,
+//                'lead_id'     => $detail->external_id,
+                'first_click'  => $detail->sources_placements,
+            ]);
         }
 
         return CommandAlias::SUCCESS;
