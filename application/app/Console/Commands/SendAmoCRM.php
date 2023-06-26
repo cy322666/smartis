@@ -43,7 +43,7 @@ class SendAmoCRM extends Command
         foreach ($leads as $model) {
 
             if ($model->first_click !== 'Остальное' &&
-                $model->last_click !== 'Остальное') {
+                $model->last_click  !== 'Остальное') {
 
                 $amoApi = (new Client(Account::first()))->init();
 
