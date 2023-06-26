@@ -6,17 +6,16 @@ use App\Models\Lead;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
-use Laravel\Octane\Exceptions\DdException;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 
-class GetInfo2 extends Command
+class GetLeads extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'smartis:info2';
+    protected $signature = 'smartis:leads';
 
     /**
      * The console command description.
@@ -30,20 +29,9 @@ class GetInfo2 extends Command
      *
      * @return int
      */
-    public function handle(): int
+    public function handle()
     {
-//        $first = Lead::query()
-//            ->where('send', false)
-//            ->where('last_click', null)
-//            ->orderByDesc('datetime')
-//            ->first();
-//
-//        $latest = Lead::query()
-//            ->where('send', false)
-//            ->orderBy('datetime')
-//            ->first();
-//
-//        $dateTo   = Carbon::parse($first->datetime ?? Carbon::now())->format('Y-m-d H:i:s');
+//        $dateTo = Carbon::parse($first->datetime ?? Carbon::now())->format('Y-m-d H:i:s');
 //        $dateFrom = Carbon::parse($latest->datetime ?? Carbon::now()->subYears(3))->format('Y-m-d H:i:s');
 
         $dateTo   = Carbon::now()->format('Y-m-d H:i:s'); //$latestDate->format('Y-m-d H:i:s');
@@ -52,22 +40,22 @@ class GetInfo2 extends Command
         $smartisResponse = Http::withToken(env('SMARTIS_TOKEN'))
             ->timeout(300)
             ->post('https://my.smartis.bi/api/reports/getReport', [
-                "project" => "object_2369",
-                "metrics" => "crm_amo_all;",
-                "groupBy" => "day",
+                "project"    => "object_2369",
+                "metrics"    => "crm_amo_all;",
+                "groupBy"    => "day",
+                "datetimeTo" => $dateTo,
                 "datetimeFrom" => $dateFrom,
-                "datetimeTo"   => $dateTo,
-                "type"     => "raw",
-                "filters" => [
+                "type"       => "raw",
+                "filters"    => [
                     [
                         "filter_category"  => 36213,
-                        "filter_condition" => "!=",
-                        "filter_value"     => false
+                        "filter_condition" => "not_empty",
+                        "filter_value"     => ""
                     ]
                 ],
-                "attribution" => [
-                    "model_id"    => 16,
-                    "period"      => "365",
+                "attribution"  => [
+                    "model_id" => 2,
+                    "period"   => "365",
                     "with_direct" => true
                 ],
                 "topCount" => 500,
@@ -77,13 +65,15 @@ class GetInfo2 extends Command
 
         foreach ($smartis->reports->crm_amo_all as $detail) {
 
-            Lead::query()
-                ->where('lead_id', $detail->external_id)
-                ->update([
-                    'last_click'  => $detail->sources_placements,
-                ]);
-        }
+            Lead::query()->create([
+                'lead_id'    => $detail->external_id,
+                'datetime'   => Carbon::parse($detail->created_at)->format('Y-m-d H:i:s'),
+                'date'       => $detail->date,
+                'person_id'  => $detail->person_id,
+                'smartis_id' => $detail->id,
+            ]);
 
+        }
         return CommandAlias::SUCCESS;
     }
 }

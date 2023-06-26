@@ -33,7 +33,7 @@ class SendAmoCRM extends Command
             ->where('first_clock', '!=', null)
             ->where('last_clock', '!=', null)
             ->where('send', false)
-            ->limit(100)
+            ->limit(env('LIMIT_SEND'))
             ->get();
 
         foreach ($leads as $lead) {

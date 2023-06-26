@@ -6,7 +6,6 @@ use App\Models\Lead;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
-use Laravel\Octane\Exceptions\DdException;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 
 class GetInfo1 extends Command
@@ -32,20 +31,20 @@ class GetInfo1 extends Command
      */
     public function handle(): int
     {
-        $latest = Lead::query()
-            ->latest('date')
-            ->where('send', false)
-            ->first();
+//        $latest = Lead::query()
+//            ->latest('date')
+//            ->where('send', false)
+//            ->first();
 
-        $latestDate = $latest ? Carbon::parse($latest->datetime) : Carbon::now();
+//        $latestDate = $latest ? Carbon::parse($latest->datetime) : Carbon::now();
 
-        $dateTo   = $latestDate->format('Y-m-d H:i:s');
-        $dateFrom = $latest ?
-                    $latestDate->subDays(3)->format('Y-m-d H:i:s') :
-                    Carbon::now()->subDays(365);
+        $dateTo   = Carbon::now()->format('Y-m-d H:i:s'); //$latestDate->format('Y-m-d H:i:s');
+        $dateFrom = Carbon::now()->subDays(365);
+//            $latest ?
+//                    $latestDate->subDays(3)->format('Y-m-d H:i:s') :
 
         $smartisResponse = Http::withToken(env('SMARTIS_TOKEN'))
-            ->timeout(180)
+            ->timeout(300)
             ->post('https://my.smartis.bi/api/reports/getReport', [
                 "project" => "object_2369",
                 "metrics" => "crm_amo_all;",
@@ -61,7 +60,7 @@ class GetInfo1 extends Command
                     ]
                 ],
                 "attribution" => [
-                    "model_id"    => 1,
+                    "model_id"    => 15,
                     "period"      => "365",
                     "with_direct" => true
                 ],
@@ -72,16 +71,22 @@ class GetInfo1 extends Command
 
         foreach ($smartis->reports->crm_amo_all as $detail) {
 
-            Lead::query()->firstOrCreate([
-                'person_id' => $detail->person_id,
-            ], [
-                'datetime'    => Carbon::parse($detail->created_at)->format('Y-m-d H:i:s'),
-                'date'        => $detail->date,
-                'person_id'   => $detail->person_id,
-                'smartis_id'  => $detail->id,
-                'lead_id'     => $detail->external_id,
-                'last_click' => $detail->sources_placements,
-            ]);
+            Lead::query()
+                ->where('lead_id', $detail->external_id)
+                ->update([
+                    'first_click'  => $detail->sources_placements,
+                ]);
+
+//            Lead::query()->firstOrCreate([
+//                'person_id' => $detail->person_id,
+//            ], [
+//                'datetime'    => Carbon::parse($detail->created_at)->format('Y-m-d H:i:s'),
+//                'date'        => $detail->date,
+//                'person_id'   => $detail->person_id,
+//                'smartis_id'  => $detail->id,
+//                'lead_id'     => $detail->external_id,
+//                'last_click' => $detail->sources_placements,
+//            ]);
         }
 
         return CommandAlias::SUCCESS;
