@@ -6,6 +6,7 @@ use App\Models\Lead;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 
 class GetLeads extends Command
@@ -31,11 +32,8 @@ class GetLeads extends Command
      */
     public function handle()
     {
-//        $dateTo = Carbon::parse($first->datetime ?? Carbon::now())->format('Y-m-d H:i:s');
-//        $dateFrom = Carbon::parse($latest->datetime ?? Carbon::now()->subYears(3))->format('Y-m-d H:i:s');
-
-        $dateTo   = Carbon::now()->format('Y-m-d H:i:s'); //$latestDate->format('Y-m-d H:i:s');
-        $dateFrom = Carbon::now()->subDays(365);
+        $dateTo   = Carbon::now()->format('Y-m-d H:i:s');
+        $dateFrom = Carbon::createFromFormat(env('DATE_FROM'), '00:00:00')->format('Y-m-d H:i:s');
 
         $smartisResponse = Http::withToken(env('SMARTIS_TOKEN'))
             ->timeout(300)
@@ -65,14 +63,18 @@ class GetLeads extends Command
 
         foreach ($smartis->reports->crm_amo_all as $detail) {
 
-            Lead::query()->create([
-                'lead_id'    => $detail->external_id,
-                'datetime'   => Carbon::parse($detail->created_at)->format('Y-m-d H:i:s'),
-                'date'       => $detail->date,
-                'person_id'  => $detail->person_id,
-                'smartis_id' => $detail->id,
-            ]);
+            try {
+                Lead::query()->create([
+                    'lead_id'    => $detail->external_id,
+                    'datetime'   => Carbon::parse($detail->created_at)->format('Y-m-d H:i:s'),
+                    'date'       => $detail->date,
+                    'person_id'  => $detail->person_id,
+                    'smartis_id' => $detail->id,
+                ]);
+            } catch (\Throwable $e) {
 
+                Log::error(__METHOD__, [$e->getFile().' : '.$e->getLine().' : '.$e->getMessage()]);
+            }
         }
         return CommandAlias::SUCCESS;
     }
