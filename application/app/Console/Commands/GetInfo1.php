@@ -45,7 +45,7 @@ class GetInfo1 extends Command
                     Carbon::now()->subDays(365);
 
         $smartisResponse = Http::withToken(env('SMARTIS_TOKEN'))
-            ->timeout(180)
+            ->timeout(300)
             ->post('https://my.smartis.bi/api/reports/getReport', [
                 "project" => "object_2369",
                 "metrics" => "crm_amo_all;",

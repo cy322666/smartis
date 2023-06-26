@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamp('date');
             $table->integer('person_id');
             $table->integer('smartis_id');
-            $table->integer('lead_id');
+            $table->integer('lead_id')->unique();
             $table->string('first_click')->nullable();
             $table->string('last_click')->nullable();
             $table->boolean('send')->default(false);
