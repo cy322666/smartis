@@ -15,7 +15,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-         $schedule->command('smartis:info1')->thursdays()->at('22:00:00');
+         $schedule->command('smartis:leads')->thursdays()->at('22:00:00');
+
+         $schedule->command('smartis:info1')->thursdays()->at('22:05:00');
          $schedule->command('smartis:info2')->thursdays()->at('22:10:00');
 
          $schedule->command('smartis:send')->thursdays()->at('22:20:00');
