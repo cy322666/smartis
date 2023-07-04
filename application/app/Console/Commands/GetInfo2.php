@@ -43,8 +43,8 @@ class GetInfo2 extends Command
             ->orderBy('datetime')
             ->first();
 
-        $dateTo   = Carbon::parse($first->datetime ?? Carbon::now())->format('Y-m-d H:i:s');
-        $dateFrom = Carbon::parse($latest->datetime ?? Carbon::now()->subDays(365))->format('Y-m-d H:i:s');
+        $dateTo   = Carbon::now()->format('Y-m-d H:i:s');
+        $dateFrom = Carbon::now()->subYears(3)->format('Y-m-d H:i:s');
 
         $smartisResponse = Http::withToken(env('SMARTIS_TOKEN'))
             ->timeout(300)

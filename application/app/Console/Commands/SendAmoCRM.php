@@ -40,18 +40,21 @@ class SendAmoCRM extends Command
             ->limit(env('LIMIT_SEND'))
             ->get();
 
+        $amoApi = (new Client(Account::first()))->init();
+
         foreach ($leads as $model) {
 
             if ($model->first_click !== 'Остальное' &&
                 $model->last_click  !== 'Остальное') {
 
-                $amoApi = (new Client(Account::first()))->init();
-
                 $lead = $amoApi->service->leads()->find($model->lead_id);
 
-                $lead->cf('')->setValue();
-                $lead->cf('')->setValue();
-                $lead->save();
+                if ($lead->cf('Ссылка Smartis')->getValue()) {
+
+                    $lead->byId('945416')->setValue($model->first_click);
+                    $lead->byId('129419')->setValue($model->last_click);
+                    $lead->save();
+                }
             }
 
             $model->send = true;
