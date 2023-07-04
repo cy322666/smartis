@@ -7,6 +7,7 @@ use App\Models\Lead;
 use App\Services\amoCRM\Client;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 
 class SendAmoCRM extends Command
@@ -47,16 +48,22 @@ class SendAmoCRM extends Command
             if ($model->first_click !== 'Остальное' &&
                 $model->last_click  !== 'Остальное') {
 
-                $lead = $amoApi->service->leads()->find($model->lead_id);
+                try {
+                    $lead = $amoApi->service->leads()->find($model->lead_id);
 
-                if ($lead->cf('Ссылка Smartis')->getValue()) {
+                    if ($lead->cf('Ссылка Smartis')->getValue()) {
 
-                    $lead->byId('945416')->setValue($model->first_click);
-                    $lead->byId('129419')->setValue($model->last_click);
-                    $lead->save();
+                        $lead->byId('945416')->setValue($model->first_click);
+                        $lead->byId('129419')->setValue($model->last_click);
+                        $lead->save();
+                    }
+                } catch (\Throwable $e) {
+
+                    Log::error(__METHOD__, [$model]);
                 }
-                $model->send = true;
             }
+
+            $model->send = true;
             $model->save();
         }
 
