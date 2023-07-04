@@ -32,8 +32,8 @@ class GetLeads extends Command
      */
     public function handle()
     {
-        $dateTo   = Carbon::now()->format('Y-m-d H:i:s');
-        $dateFrom = Carbon::createFromFormat(env('DATE_FROM'), '00:00:00')->format('Y-m-d H:i:s');
+        $dateTo   = Carbon::now()->format('Y-m-d');
+        $dateFrom = Carbon::parse(env('DATE_FROM'))->format('Y-m-d');
 
         $smartisResponse = Http::withToken(env('SMARTIS_TOKEN'))
             ->timeout(300)
