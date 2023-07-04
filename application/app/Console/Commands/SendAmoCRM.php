@@ -53,8 +53,8 @@ class SendAmoCRM extends Command
 
                     if ($lead->cf('Ссылка Smartis')->getValue()) {
 
-                        $lead->byId('945416')->setValue($model->first_click);
-                        $lead->byId('129419')->setValue($model->last_click);
+                        $lead->cf()->byId('945416')->setValue($model->first_click);
+                        $lead->cf()->byId('129419')->setValue($model->last_click);
                         $lead->save();
 
                         $model->send = true;
