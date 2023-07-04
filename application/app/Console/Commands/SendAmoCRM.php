@@ -61,7 +61,7 @@ class SendAmoCRM extends Command
                     }
                 } catch (\Throwable $e) {
 
-                    Log::error(__METHOD__, [$model]);
+                    Log::error(__METHOD__, [$e->getMessage().' '.$e->getFile().' '.$e->getLine()]);
                 }
             }
 
