@@ -32,11 +32,6 @@ class GetInfo1 extends Command
      */
     public function handle(): int
     {
-        $latest = Lead::query()
-            ->latest('date')
-            ->where('send', false)
-            ->first();
-
         $dateTo   = Carbon::now()->format('Y-m-d H:i:s');
         $dateFrom = Carbon::now()->subYears(3)->format('Y-m-d H:i:s');
 
@@ -72,7 +67,7 @@ class GetInfo1 extends Command
                 ->where('lead_id', $detail->external_id)
                 ->first();
 
-            if ($lead->exists()) {
+            if ($lead) {
 
                 $lead->fill(['last_click' => $detail->sources_placements]);
                 $lead->save();
