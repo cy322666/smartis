@@ -55,9 +55,8 @@ class SendAmoCRM extends Command
                     $lead->byId('129419')->setValue($model->last_click);
                     $lead->save();
                 }
+                $model->send = true;
             }
-
-            $model->send = true;
             $model->save();
         }
 
