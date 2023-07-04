@@ -56,6 +56,8 @@ class SendAmoCRM extends Command
                         $lead->byId('945416')->setValue($model->first_click);
                         $lead->byId('129419')->setValue($model->last_click);
                         $lead->save();
+
+                        $model->send = true;
                     }
                 } catch (\Throwable $e) {
 
@@ -63,7 +65,6 @@ class SendAmoCRM extends Command
                 }
             }
 
-            $model->send = true;
             $model->save();
         }
 
